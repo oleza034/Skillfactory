@@ -1,0 +1,327 @@
+{
+	"info": {
+		"_postman_id": "7e99bca9-a953-4f9a-80a9-da172061b0ec",
+		"name": "8.7 REST API queries (PetFriends)",
+		"description": "WARNING!!! use external CSV file with test data. Also, include your {{email}} and {{password}} into external file.\n\nFile should contain columns:  \n\\- name (pet's name)  \n\\- type (dog / cat, etc.)  \n\\- age  \n\\- email (user login)  \n\\- pass (user password)\n\nexample:\n\n```\nemail,pass,name,type,age\nmyemail@mail.ru,P@$$w0rd,Бусинка,мыша,0.6\nmyemail@mail.ru,P@$$w0rd,Геракл,монстр,древний\n\n```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21686773"
+	},
+	"item": [
+		{
+			"name": "Get API key",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Check login status and save auth_key\", function () {\r",
+							"    var jsonData = JSON.parse(responseBody);\r",
+							"    pm.expect(jsonData).to.have.all.keys('key');\r",
+							"    pm.collectionVariables.set(\"auth_key\", jsonData.key);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "email",
+						"value": "{{email}}",
+						"description": "use external CSV file to define test data. Refer to collection's description for details.",
+						"type": "text"
+					},
+					{
+						"key": "password",
+						"value": "{{pass}}",
+						"description": "use external CSV file to define test data. Refer to collection's description for details.",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/key",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"key"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create pet",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Pet creation status code = 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type header is application/json\", () => {\r",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');\r",
+							"});\r",
+							"pm.test(\"Save new pet's ID + name\", function() {\r",
+							"    var jsonData = JSON.parse(responseBody);\r",
+							"    pm.collectionVariables.set(\"petid\", jsonData.id);\r",
+							"    pm.collectionVariables.set(\"name\", jsonData.name);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{name}}",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/create_pet_simple",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"create_pet_simple"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change pet",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.variables.set(\"name\",pm.variables.get(\"name\") + \"_new\")\r",
+							"if(pm.collectionVariables.get(\"type\") === \"собака\") {\r",
+							"    pm.variables.set(\"type\", \"кошка\")\r",
+							"}\r",
+							"else {\r",
+							"    pm.variables.set(\"type\", \"собака\")\r",
+							"}\r",
+							"if(\"\" + pm.variables.get(\"age\") === \"1\") {\r",
+							"    pm.variables.set(\"age\", 0)\r",
+							"}\r",
+							"else {\r",
+							"    pm.variables.set(\"age\", 1)\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.test(\"Change status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Pet's name is really changed\", function() {\r",
+							"    pm.expect(pm.collectionVariables.get(\"name\")).not.to.eql(jsonData.name)\r",
+							"});\r",
+							"pm.test(\"Save changed pet's name\", function() {\r",
+							"    pm.collectionVariables.set(\"name\", jsonData.name);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "{{name}}_new",
+							"type": "text"
+						},
+						{
+							"key": "animal_type",
+							"value": "{{type}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/pets/{{petid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets",
+						"{{petid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List my pets",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Check pet's name\", function() {\r",
+							"    pm.expect(jsonData.pets[0].name).to.eql(pm.collectionVariables.get(\"name\"));\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/pets?filter=my_pets",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"pets"
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "my_pets"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{auth_key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "auth_key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://petfriends.skillfactory.ru",
+			"type": "string"
+		},
+		{
+			"key": "auth_key",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "petid",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "name",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "age",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "type",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
