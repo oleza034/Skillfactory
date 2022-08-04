@@ -79,7 +79,7 @@
 							"});\r",
 							"pm.test(\"Save new pet's ID + name\", function() {\r",
 							"    var jsonData = JSON.parse(responseBody);\r",
-							"    pm.collectionVariables.set(\"petid\", jsonData.id);\r",
+							"    pm.collectionVariables.set(\"pet_id\", jsonData.id);\r",
 							"    pm.collectionVariables.set(\"name\", jsonData.name);\r",
 							"});"
 						],
@@ -203,14 +203,14 @@
 					]
 				},
 				"url": {
-					"raw": "{{base_url}}/api/pets/{{petid}}",
+					"raw": "{{base_url}}/api/pets/{{pet_id}}",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"api",
 						"pets",
-						"{{petid}}"
+						"{{pet_id}}"
 					]
 				}
 			},
@@ -304,7 +304,7 @@
 			"type": "string"
 		},
 		{
-			"key": "petid",
+			"key": "pet_id",
 			"value": "",
 			"type": "string"
 		},
