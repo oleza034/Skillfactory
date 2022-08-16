@@ -34,13 +34,13 @@ def totals(guests_list: [], discount=False):
     :param discount: True if you want to get just discount; False for order totals
     :return: total price for the order or the sum of discount value, if requested
     '''
-    return sum(((.1 if discount else .9) if len(guests_list) > 3 else 1) * p for p in map(price, guests_list))
+    return sum((.1 if discount else (.9 if len(guests_list) > 3 else 1)) * p for p in map(price, guests_list))
 
 
 n = input("Введите количество пользователей: ")
 
 # check whether user typed a number
-while(not n.isdigit()):
+while(not n.isdigit() or int(n) == 0):
     n = input("Ошибка. Введите число, соответствующее количеству пользователей: ")
 
 # store number of users
