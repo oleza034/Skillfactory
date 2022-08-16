@@ -53,7 +53,7 @@ for i in range(1, n + 1):
 
     # check input to be a number
     while not age.isdigit() or age.isdigit() and int(age) >= 200:
-        age = input(("Неверный ввод. " + ("Введите число" if age.isdigit() else "Введите возраст меньше 200 лет")
+        age = input(("Неверный ввод. " + ("Введите возраст меньше 200 лет" if age.isdigit() else "Введите число")
             + ". Повторите ввод возраста {}-го пользователя: ").format(i))
 
     print('user\'s price: ', price(int(age)))
