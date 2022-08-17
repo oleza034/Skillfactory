@@ -8,7 +8,7 @@
 - Хорошо знаю **HTML / CSS / Javascript**. Могу разобраться в коде.
 - Знаком с **REST API**. Могу написать тесты в *Postman*
 - Опыт по **ручному тестированию**: 1) Итоговая работа - https://docs.google.com/spreadsheets/d/1mj-xmH4HcSPK8cg1_ARbtU2Qky1F9d2B1vuzv2WnH8o?usp=drive_fs 2) Тестовое задание от "СберЗдоровья": https://1drv.ms/x/s!AmieC-lsKAJ9gYpEuM3h_BxtWjbTlQ?e=mY2MG4
-- Microsoft Windows, Microsoft Office - продвинутый пользователь
+- **Microsoft Windows, Microsoft Office** - продвинутый пользователь
 - **Английский язык** - разговорный intermediate (B1), хороший письменный. Опыт общения на техническом английском.
 - ответственный подход к задачам
 - обучаемость
