@@ -1,0 +1,410 @@
+{
+	"info": {
+		"_postman_id": "167fa934-3c97-4437-b27e-29dc8310881f",
+		"name": "Timetta test stand",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21686773"
+	},
+	"item": [
+		{
+			"name": "Get Access Token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Test and save login data\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData).to.have.property('refresh_token');\r",
+							"    pm.collectionVariables.set(\"AccessToken\", jsonData.access_token);\r",
+							"    pm.collectionVariables.set(\"RefreshToken\", jsonData.refresh_token);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"connection": true,
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "ru,ru-ru;q=0.9,en-us;q=0.8,en;q=0.7",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "external",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "all offline_access",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{UserName}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{Password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://auth.timetta.com/connect/token",
+					"protocol": "https",
+					"host": [
+						"auth",
+						"timetta",
+						"com"
+					],
+					"path": [
+						"connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query ProjectBillingTypes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Collect ID for fixed payment\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    for (let i = 0; i < jsonData.value.length; i++) {\r",
+							"        if (jsonData.value[i].name == \"Фиксированная стоимость\") {\r",
+							"            pm.expect(jsonData.value[i]).to.have.property(\"id\");\r",
+							"            pm.collectionVariables.set(\"BillingTypeId\", jsonData.value[i].id);\r",
+							"        }\r",
+							"    }\r",
+							"    pm.expect(pm.collectionVariables.get(\"BillingTypeId\")).to.not.null;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.timetta.com/odata/ProjectBillingTypes",
+					"protocol": "https",
+					"host": [
+						"api",
+						"timetta",
+						"com"
+					],
+					"path": [
+						"odata",
+						"ProjectBillingTypes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Project Managers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Collect manager ID\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    let m1 = \"\", m2 = \"\", org = \"\", org_id = \"\";\r",
+							"\r",
+							"    for (let i = 0; (i < jsonData.value.length) & ((m1 == \"\") | (m2 == \"\") | (org_id == \"\")); i++) {\r",
+							"        if (jsonData.value[i].manager.name == \"Александр Нестеров\") {\r",
+							"            m1 = jsonData.value[i].manager.id;\r",
+							"        };\r",
+							"        if (jsonData.value[i].manager.name == \"Иван Агафонов\") {\r",
+							"            m2 = jsonData.value[i].manager.id;\r",
+							"        };\r",
+							"\r",
+							"        org = jsonData.value[i].organization;\r",
+							"        if (org != null) {\r",
+							"            if (org.name == \"Главпродукт\") {\r",
+							"                org_id = org.id;\r",
+							"            };\r",
+							"        };\r",
+							"    };\r",
+							"\r",
+							"    pm.expect(m1).to.not.equal(\"\");\r",
+							"    pm.expect(m2).to.not.equal(\"\");\r",
+							"    pm.expect(org).to.not.equal(\"\");\r",
+							"    pm.collectionVariables.set(\"Manager1Id\", m1);\r",
+							"    pm.collectionVariables.set(\"Manager2Id\", m2);\r",
+							"    pm.collectionVariables.set(\"OrganizationId\", org_id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.timetta.com/odata/Projects?$expand=manager($select=id,name),organization($select=id,name)&$top=5&$select=modified,organizationId",
+					"protocol": "https",
+					"host": [
+						"api",
+						"timetta",
+						"com"
+					],
+					"path": [
+						"odata",
+						"Projects"
+					],
+					"query": [
+						{
+							"key": "$expand",
+							"value": "manager($select=id,name),organization($select=id,name)"
+						},
+						{
+							"key": "$top",
+							"value": "5"
+						},
+						{
+							"key": "$select",
+							"value": "modified,organizationId"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Collect manager ID\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.collectionVariables.set(\"ProjectId\", jsonData.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Олег Заказнов\",\r\n    \"billingTypeId\": \"{{BillingTypeId}}\",\r\n    \"managerId\": \"{{Manager1Id}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.timetta.com/odata/Projects",
+					"protocol": "https",
+					"host": [
+						"api",
+						"timetta",
+						"com"
+					],
+					"path": [
+						"odata",
+						"Projects"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check project",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains project ID\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"ProjectId\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"{{ProjectId}}\",\r\n    \"name\": \"Олег Заказнов\",\r\n    \"billingTypeId\": \"{{BillingTypeId}}\",\r\n    \"managerId\": \"{{Manager1Id}}\",\r\n    \"organizationId\": \"{{organizationId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.timetta.com/odata/Projects({{ProjectId}})?$expand=manager($select=id,name)&$select=id,name,organizationId",
+					"protocol": "https",
+					"host": [
+						"api",
+						"timetta",
+						"com"
+					],
+					"path": [
+						"odata",
+						"Projects({{ProjectId}})"
+					],
+					"query": [
+						{
+							"key": "$expand",
+							"value": "manager($select=id,name)"
+						},
+						{
+							"key": "$select",
+							"value": "id,name,organizationId"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{AccessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "AccessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "RefreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "UserName",
+			"value": "NesterovA@test-task.ru",
+			"type": "string"
+		},
+		{
+			"key": "Password",
+			"value": "gG9NfM",
+			"type": "string"
+		},
+		{
+			"key": "BillingTypeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "Manager1Id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "Manager2Id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "OrganizationId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ProjectId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
