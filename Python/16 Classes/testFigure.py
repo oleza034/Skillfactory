@@ -18,6 +18,11 @@ circle2 = Circle(10)
 print(circle1)
 print(circle2)
 
+'''
+    Triangle(width, height, x, y) is nonsense.
+    I assume that triangle has 3 corners:
+    (0, 0), (0, width), (x, y)
+'''
 triangle1 = Triangle(1, 1, 2)
 triangle2 = Triangle(5, 10, 50)
 
