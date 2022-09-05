@@ -13,7 +13,7 @@ try:
 
     circle1 = Circle(5)
     print(circle1)
-    circle2 = Circle(10)
+    circle2 = Circle(-10)
     print(circle2)
 
     '''

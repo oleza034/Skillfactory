@@ -1,7 +1,10 @@
 class Rectangle:
     def __init__(self, width, height):
-        self.width = width
-        self.height = height
+        if width < 0 or height < 0:
+            raise NonPositiveDigitException('Unable to create rectangle: width or height is less than 0')
+        else:
+            self.width = width
+            self.height = height
 
     def getWidth(self):
         return self.width
@@ -17,8 +20,11 @@ class Rectangle:
 
 class Square(Rectangle):
     def __init__(self, width):
-        self.width = width
-        self.height = width
+        if width < 0:
+            raise NonPositiveDigitException('Unable to create square: width is less than 0')
+        else:
+            self.width = width
+            self.height = width
 
     def getArea(self):
         return self.width ** 2
@@ -28,7 +34,10 @@ class Square(Rectangle):
 
 class Circle:
     def __init__(self, radius):
-        self.radius = radius
+        if radius < 0:
+            raise NonPositiveDigitException('Unable to create circle: radius is less than 0')
+        else:
+            self.radius = radius
 
     def getArea(self):
         return round(3.1416 * (self.radius ** 2), 4)
@@ -44,12 +53,20 @@ class Triangle:
     width = the length of the side opposite to the peak at (x, y) coordinate
     '''
     def __init__(self, x, y, width):
-        self.x = x
-        self.y = y
-        self.width = width
+        if width < 0:
+            raise NonPositiveDigitException('Unable to create triangle: width or height is less than 0')
+        else:
+            self.x = x
+            self.y = y
+            self.width = width
 
     def __str__(self):
         return f'[Triangle: x={self.x}, y={self.y}, width={self.width}]'
 
     def getArea(self):
         return self.width * self.y / 2
+
+class NonPositiveDigitException(ValueError):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
