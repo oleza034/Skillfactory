@@ -1,4 +1,4 @@
-from figure import Rectangle, Square, Circle, Triangle, NonPositiveDigitException
+from figure import *
 
 try:
     rectangle1 = Rectangle(3, 4)
