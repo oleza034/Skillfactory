@@ -1,4 +1,4 @@
-TOKEN = None
+TOKEN = '5796252559:AAGvNlYwUmWheahyV4f3hOcdBzamWkEfETY'
 admins = ['olegzakaznov']
 
 help_txt = 'Чтобы конвертировать валюту, наберите запрос в формате:\n' \
