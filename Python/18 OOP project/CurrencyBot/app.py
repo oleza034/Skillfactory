@@ -4,7 +4,7 @@ This telegram bot used to convert currencies with API
 """
 import telebot
 from config import help_txt, keys, TOKEN, bot_address
-from extentions import APIException, CryptoConverter
+from extensions import APIException, CryptoConverter
 
 
 bot = telebot.TeleBot(TOKEN)
