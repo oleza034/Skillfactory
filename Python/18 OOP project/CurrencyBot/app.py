@@ -3,12 +3,13 @@
 This telegram bot used to convert currencies with API
 """
 import telebot
-from config import help_txt, keys, TOKEN # , admins
+from config import help_txt, keys, TOKEN, bot_address
 from extentions import APIException, CryptoConverter
 
 
 bot = telebot.TeleBot(TOKEN)
 print('starting with token:', TOKEN)
+print('Connect to bot by', bot_address)
 
 
 @bot.message_handler(commands=['start', 'help', 'помощь', 'справка', '?', 'h'])

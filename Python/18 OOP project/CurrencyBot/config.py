@@ -1,5 +1,5 @@
-TOKEN = '...'
-admins = ['olegzakaznov']
+TOKEN = '5796252559:AAGvNlYwUmWheahyV4f3hOcdBzamWkEfETY'
+bot_address = 'https://t.me/oleza034_currency_bot'
 
 help_txt = 'Чтобы конвертировать валюту, наберите запрос в формате:\n' \
             '<меняемая валюта> <получаемая валюта> <количество исходной валюты>.\n' \
