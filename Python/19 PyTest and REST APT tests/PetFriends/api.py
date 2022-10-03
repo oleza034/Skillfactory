@@ -4,13 +4,16 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
 class PetFriends:
+    '''
+    API Help: https://petfriends.skillfactory.ru/apidocs/
+    '''
     def __init__(self):
         self.base_url = 'https://petfriends.skillfactory.ru/'
         self.paths = {
             'get_api_key': 'api/key',
             'list_pets': 'api/pets',
             'create_pet': 'api/pets',
-            'delete_pet': 'api/pets'
+            'delete_pet': 'api/pets/'
         }
         self.headers = {'Accept': 'application/json'}
         self.my_pets = []
@@ -76,7 +79,6 @@ class PetFriends:
         elif not pet_photo:
             print('Create pet failed: empty photo URL')
         else:
-            url = self.base_url + self.paths['create_pet']
             if pet_photo[-4:] == '.jpg' or pet_photo[-5:] == '.jpeg':
                 photo_type = 'image/jpeg'
             elif pet_photo[-4:] == '.png':
@@ -90,16 +92,17 @@ class PetFriends:
             else:
                 url = self.base_url + self.paths['create_pet']
                 data = MultipartEncoder(
-                    fields = {
+                    fields={
                         'name': name,
                         'animal_type': animal_type,
-                        'age': age,
-                        'photo': (pet_photo, open(pet_photo, 'rb'), photo_type)
+                        'age': str(age),
+                        'pet_photo': (pet_photo, open(pet_photo, 'rb'), photo_type)
                     }
                 )
-                headers = {'content-type': data.content_type} | self.headers
-                print('create pet headers:', headers)
-                resp = requests.post(url, data=body, headers=headers)
+                # print('data =', data)
+                headers = {'content-type': data.content_type, 'accept': '*/*'} | self.headers
+                # print('create pet headers:', headers)
+                resp = requests.post(url, data=data, headers=headers)
                 if resp.status_code != 200:
                     print(f'Error create pet: {resp.status_code}:',
                           (resp.text if len(resp.text) < 255 else (resp.text[:253] + '...')))
@@ -119,28 +122,17 @@ class PetFriends:
                     else:
                         print('Unsupported json response type', j)
 
-    def delete_pet(self):
-        pet_id = self.my_pets[-1]
+    def delete_pet(self, pet_id=None):
+        if not pet_id:
+            pet_id = self.my_pets.pop()
+        else:
+            self.my_pets.pop(self.my_pets.index(pet_id))
         if pet_id:
-            url = self.base_url + self.paths['pet_by_id'] + str(pet_id)
-            resp = requests.get(url, headers=self.headers)
-            if resp.status_code == 200 and resp.headers['content-type'] == 'application/json':
-                j = resp.json()
-                if type(j) == list:
-                    j = j[0]
-                if type(j) == dict and j['id'] == pet_id:
-                    name = j['name']
-
-                    url = self.base_url + self.paths['delete_pet'] + str(pet_id)
-                    resp = requests.delete(url, headers=self.headers)
-                    if resp.status_code == 200 and resp.headers['content-type'] == 'application/json':
-                        j = resp.json()
-                        print(f'pet {name} (id={pet_id}) deleted successfully:')
-                        print(j)
-                    else:
-                        print('wrong deletion response:', f'{resp.status_code}: {resp.text}')
-                else:
-                    print('cannot find pet with id:', pet_id)
+            url = self.base_url + self.paths['delete_pet'] + str(pet_id)
+            resp = requests.delete(url, headers=self.headers)
+            if resp.status_code == 200:
+                print(f'pet (id={pet_id}) deleted successfully')
+                print(resp.text)
             else:
                 print('wrong reply from server:', f'{resp.status_code}: {resp.text}')
         else:
@@ -150,4 +142,5 @@ class PetFriends:
 pet_friends = PetFriends()
 pet_friends.list_pets()
 pet_friends.create_pet('Кусака', 'собака', 3, 'kusaka.jpg')
-# pet_friends.delete_pet()
+while pet_friends.my_pets:
+    pet_friends.delete_pet()
