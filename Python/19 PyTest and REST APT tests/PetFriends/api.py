@@ -98,14 +98,19 @@ class PetFriends:
 
         # ready to send a request
         url = self.base_url + self.paths['create_pet']
-        data = MultipartEncoder(
-            fields={
-                'name': name,
-                'animal_type': animal_type,
-                'age': str(age),
-                'pet_photo': (pet_photo, open(pet_photo, 'rb'), photo_type)
-            }
-        )
+        try:
+            data = MultipartEncoder(
+                fields={
+                    'name': name,
+                    'animal_type': animal_type,
+                    'age': str(age),
+                    'pet_photo': (pet_photo, open(pet_photo, 'rb'), photo_type)
+                }
+            )
+        except FileNotFoundError:
+            print('Cannot find pet\'s photo file:', pet_photo)
+            return []
+
         headers = {'content-type': data.content_type, 'accept': '*/*'} | self.headers
         resp = requests.post(url, data=data, headers=headers)
         if resp.status_code != 200:
@@ -146,7 +151,10 @@ class PetFriends:
 
 
 pet_friends = PetFriends()
-print('There are already pets:', *pet_friends.my_pets, sep='\n')
-print('Added new pet:', pet_friends.create_pet('Кусака', 'собака', 3, 'kusaka.jpg'))
+if pet_friends.my_pets:
+    print('There are already pets:', *pet_friends.my_pets, sep='\n')
+else:
+    print('There are no pets yet.')
+print('Added new pet:', pet_friends.create_pet('Кусака', 'собака', 3, 'images/kusaka.jpg'))
 while pet_friends.my_pets:
     pet_friends.delete_pet()
