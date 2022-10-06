@@ -13,12 +13,12 @@ class PetFriends:
     """
     def __init__(self):
         self.base_url = 'https://petfriends.skillfactory.ru/'
-        self.paths = {
-            'get_api_key': 'api/key',
-            'get_pets': 'api/pets',
-            'create_pet': 'api/pets',
-            'delete_pet': 'api/pets/',
-            'update_pet': 'api/pets/'
+        self.requests = {
+            'get_api_key': {'url': self.base_url + 'api/key', 'method': 'GET'},
+            'get_pets': {'url': self.base_url + 'api/pets', 'method': 'GET', 'params': {'filter': 'my_pets'}},
+            'create_pet': {'url': self.base_url + 'api/pets', 'method': 'POST'},
+            'delete_pet': {'url': self.base_url + 'api/pets/', 'method': 'DELETE'},
+            'update_pet': {'url': self.base_url + 'api/pets/', 'method': 'PUT'}
         }
         self.headers = {'Accept': 'application/json'}
         self.my_pets = []
@@ -32,17 +32,36 @@ class PetFriends:
         except PetFriendsException as e:
             print(e)
 
+    def send_request(self, method: str, url: str, headers: dict = {}, data = None, params = None) -> requests.Response:
+        methods = ['GET', 'POST', 'PUT', 'DELETE']
+        if not url:
+            raise PetFriendsException('Request URL is empty')
+        if method.upper() not in methods:
+            raise PetFriendsException('Unclear request method:', method)
+        if type(headers) != dict:
+            headers = self.headers
+        else:
+            headers = headers | self.headers
+        if type(data) == MultipartEncoder:
+            headers = {'content-type': data.content_type} | headers
+        if not data:
+            data = None
+        if not params:
+            params = None
+        resp = self.sess.request(method, url, params=params, data=data, headers=headers)
+        return resp
+
     def get_api_key(self, force=False):
         if not force and 'auth_key' in self.headers: # Cached credinals
             return 200, self.headers['auth_key']
-        url = self.base_url + self.paths['get_api_key']
-        headers = self.headers | {'email': settings.valid_email, 'password': settings.valid_password}
-        resp = self.sess.get(url, headers=headers)
+        req = self.requests['get_api_key']
+        req['headers'] = {'email': settings.valid_email, 'password': settings.valid_password}
+        resp = self.send_request(**req)
         if resp.status_code == 200 and resp.headers['content-type'] == 'application/json':
             j = resp.json()
             if type(j) == dict and 'key' in j.keys():
                 self.headers['auth_key'] = j['key']
-                print('logged in as', headers['email'])
+                print('logged in as', req['headers']['email'])
                 return resp.status_code, j['key']
             else:
                 raise PetFriendsException('logon error: \'key\' is not found in response keys:\n' + str(j))
@@ -56,9 +75,8 @@ class PetFriends:
     def get_pets(self, pet_id=None) -> list:
         if 'auth_key' not in self.headers:
             raise PetFriendsException('Get pets error: need a new key')
-        url = self.base_url + self.paths['get_pets']
-        params = {'filter': 'my_pets'}
-        resp = self.sess.get(url, params=params, headers=self.headers)
+        req = self.requests['get_pets']
+        resp = self.send_request(**req)
         if resp.status_code == 403:
             del self.headers['auth_key']
             raise PetFriendsException('Get pets error: logon expired. Get a new api_key')
@@ -106,7 +124,7 @@ class PetFriends:
             raise PetFriendsException('photo file extension not supported:', pet_photo)
 
         # ready to send a request
-        url = self.base_url + self.paths['create_pet']
+        req = self.requests['create_pet']
         try:
             data = MultipartEncoder(
                 fields={
@@ -117,11 +135,10 @@ class PetFriends:
                 }
             )
         except FileNotFoundError:
-            print('Cannot find pet\'s photo file:', pet_photo)
-            return []
+            raise PetFriendsException('Cannot find pet\'s photo file: ' + pet_photo)
 
-        headers = {'content-type': data.content_type, 'accept': '*/*'} | self.headers
-        resp = self.sess.post(url, data=data, headers=headers)
+        req['data'] = data
+        resp = self.send_request(**req)
         if resp.status_code == 200 and resp.headers['content-type'] == 'application/json':
             j = resp.json()
             if type(j) == list:
@@ -151,7 +168,8 @@ class PetFriends:
             raise PetFriendsException('Update pet error: pet not found. Pet_id = ' + str(pet_id))
         if not name and not animal_type and not age: # check if at least one parameter is given
             raise PetFriendsException('Update pet error: nothing to update. Missing parameters')
-        url = self.base_url + self.paths['update_pet'] + pet_id
+        req = self.requests['update_pet']
+        req['url'] += pet_id
         fields = {} # prepare fields for request's formData
         if name:
             fields['name'] = str(name)
@@ -160,8 +178,8 @@ class PetFriends:
         if age:
             fields['age'] = str(age)
         data = MultipartEncoder(fields=fields)
-        headers = {'content-type': data.content_type} | self.headers
-        resp = self.sess.put(url, data=data, headers=headers)
+        req['data'] = data
+        resp = self.send_request(**req)
 
         if resp.status_code == 200 and resp.headers['content-type'] == 'application/json':
             j = resp.json()
@@ -180,8 +198,9 @@ class PetFriends:
         else:
             self.my_pets.pop([i['id'] for i in self.my_pets].index(pet_id))
         if pet_id:
-            url = self.base_url + self.paths['delete_pet'] + str(pet_id)
-            resp = self.sess.delete(url, headers=self.headers, cookies = self.cookies)
+            req = self.requests['delete_pet']
+            req['url']  += str(pet_id)
+            resp = self.send_request(**req)
             if resp.status_code == 200:
                 print(f'pet (id={pet_id}) deleted successfully')
                 print(resp.text)
