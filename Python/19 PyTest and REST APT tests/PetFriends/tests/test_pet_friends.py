@@ -10,13 +10,10 @@ def test_get_api_key_for_valid_user(email=valid_email, password=valid_password):
     """ Проверяем что запрос api ключа возвращает статус 200 и в тезультате содержится слово key"""
 
     # Отправляем запрос и сохраняем полученный ответ с кодом статуса в status, а текст ответа в result
-    print('Test1: 1')
     status, result = pf.get_api_key()
 
     # Сверяем полученные данные с нашими ожиданиями
-    print('Test1: 2')
     assert status == 200
-    print('Test1: 3')
     assert type(result) is str and len(result) > 0
 
 
