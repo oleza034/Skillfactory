@@ -6,6 +6,9 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
 class PetError(Exception):
+    """
+    internal exception that is raised in common use cases
+    """
     pass
 
 
@@ -14,10 +17,14 @@ class PetStore:
         self.base_url = 'https://petstore.swagger.io/v2/'
         self.base_headers = {'accept': 'application/json'}
 
-        # add_req('get_user', 'GET', base_url + 'user/', base_headers)
 
     @staticmethod
     def check_user_array(array: list) -> tuple:
+        """
+        Internal method. Checks if user data is valid.
+        :param array: array with user data
+        :return: bool value that indicates the user data is valid. The 2nd value is an error message in case of invalid data
+        """
         correct_keys = {'id': int, 'username': str, 'firstName': str, 'lastName': str,
                         'email': str, 'password': str, 'phone': str, 'userStatus': int}
         f = True # assume that array is correct
@@ -48,7 +55,7 @@ class PetStore:
 
     def check_file(self, file_name: str) -> tuple:
         """
-        checks if file exists and determines its MIME type
+        Internal method. Checks if file exists and determines its MIME type
         :param file_name: file_name
         :return: mime_type, full name and file_name (without directories).
         """
@@ -75,6 +82,12 @@ class PetStore:
         return mime_type, real_name, file_name
 
     def parse_datetime(self, date_obj: datetime) -> datetime:
+        """
+        Internal method. Gets an object and represents UTC datatime from it.
+        If object is invalid, returns datatime in a 7 days from now
+        :param date_obj: datetime object
+        :return: datetime object
+        """
         if type(date_obj) == str:
             try:
                 date_obj = datetime.fromisoformat(date_obj)
@@ -89,6 +102,15 @@ class PetStore:
         return datetime.isoformat(date_obj)
 
     def request(self, method: str, url: str, content_type: str = None, data = None, params = None):
+        """
+        Internal method. Sends a request and returns its result in fromat (status_code, body)
+        :param method: method that should be used ['POST', 'GET', 'PUT', 'DELETE']
+        :param url: path that should be added to base URL
+        :param content_type: (optional) Content-Type header's value
+        :param data: request's data (body)
+        :param params: parameters that should be added to URL like, ?key1=value1&key2=value2, etc.
+        :return: ttuple with status_code and response's body
+        """
         req = {'method': method, 'url': self.base_url + url, 'headers': self.base_headers}
         if content_type is not None:
             req['headers']['Content-Type'] = content_type
@@ -103,24 +125,50 @@ class PetStore:
             return resp.status_code, resp.text
 
     def users_create_array(self, array: list):
+        """
+        Sends user/createWithArray request
+        :param array: array with new users' data
+        :return: tuple with status_code and response's body
+        """
         f = self.check_user_array(array)
         if not f[0]:
             raise PetError(f'Create users_array failed: {f[1]}')
         return self.request('POST', 'user/createWithArray', 'application/json', json.dumps(array, ensure_ascii=False))
 
     def user_create_list(self, array: list):
+        """
+        Sends user/createWithList request
+        :param array: array with users' data
+        :return: tuple with status_code and response's body
+        """
         f = self.check_user_array(array)
         if not f[0]:
             raise PetError(f'Create users with list failed: {f[1]}')
         return self.request('POST', 'user/createWithList', 'application/json', json.dumps(array, ensure_ascii=False))
 
     def user_get(self, username: str):
+        """
+        Searches user by username
+        :param username: str with username
+        :return: tuple with status_code and response's body
+        """
         if not username or type(username) != str:
             raise PetError('Parameter \'username\' must be non-empty string')
         return self.request('GET', 'user/' + username)
 
     def user_update(self, username: str, new_username: str = '', firstname: str = '', lastname: str = '',
                     email: str = '', password: str = '', phone: str = '') -> tuple:
+        """
+        Sends user update request.
+        :param username: Required. Username that will be changed
+        :param new_username: Optional. new username that replaces old username. If empty, data is not changed
+        :param firstname: Optional. user's first name. if empty, data is not changed
+        :param lastname: Optional. user's last name. if empty, data is not changed
+        :param email: Optional. user's email address. if empty, data is not changed
+        :param password: Optional. user's password. if empty, data is not changed
+        :param phone: Optional. user's phone number. if empty, data is not changed
+        :return: tuple with status_code and response's body
+        """
         # check that username is given correctly
         if not username or type(username) != str:
             raise PetError('Parameter \'username\' must be non-empty string')
@@ -151,16 +199,41 @@ class PetStore:
             })
         return self.request('PUT', 'user/' + username, 'application/json', json.dumps(user[1], ensure_ascii=False))
 
-    def user_delete(self, username):
+    def user_delete(self, username: str):
+        """
+        Sends request to delete existing user
+        :param username: Required. Str object with username
+        :return: tuple with status_code and response's body
+        """
         return self.request('DELETE', 'user/' + username)
 
     def user_login(self, username: str, password: str):
+        """
+        Sends user login request
+        :param username: Required. Username
+        :param password: Required. user's password
+        :return: tuple with status_code and response's body
+        """
         return self.request('GET', 'user/login', params={'username': username, 'password': password})
 
     def user_logout(self):
+        """
+        Sends logout request. No data required
+        :return: tuple with status_code and response's body
+        """
         return self.request('GET', 'user/logout')
 
     def user_create(self, username: str, firstname: str, lastname: str, email: str, password: str, phone: str):
+        """
+        Sends create user request with new user's data
+        :param username: Required. username
+        :param firstname: Required. first name
+        :param lastname: Required. last name
+        :param email: Required. user's email
+        :param password: Required. user's password
+        :param phone: Required. user's phone
+        :return: tuple with status_code and response's body
+        """
         body = json.dumps({
             'id': 0,
             'username': username if type(username) == str else '',
@@ -174,6 +247,12 @@ class PetStore:
         return self.resp_results('POST', 'user', 'application/json', body)
 
     def pet_upload_image(self, pet_id: str, file_name: str):
+        """
+        Sends upload image requests for existing pet
+        :param pet_id: pet_id
+        :param file_name: file name with new image. Must be either jpg, png or gif file type
+        :return: tuple with status_code and response's body
+        """
         mime_type, file_name, real_name = self.check_file(file_name)
         # check if file exists and open file
         if not file_name:
@@ -185,24 +264,60 @@ class PetStore:
 
     def pet_add(self, name: str, category: dict = {'id': 0, 'name': 'string'}, photo_urls: list = ['string'],
                 tags: list = [{'id': 0, 'name': 'string'}], status='available'):
+        """
+        Sends pet add request with new pet's data
+        :param name: Required. Pet's name
+        :param category: Optional. dict object with 'id' and 'name' of category
+        :param photo_urls: Optional. list with photo URLs
+        :param tags: Optional. Pet's tags
+        :param status: Optional. Status of new pet
+        :return: tuple with status_code and response's body
+        """
         pet = {'id': 0, 'category': category, 'name': name, 'photoUrls': photo_urls, 'tags': tags, 'status': status}
         return self.request('POST', 'pet', 'application/json', json.dumps(pet, ensure_ascii=False).encode('utf-8'))
 
     def pet_update(self,pet_id: int, name: str, category: dict = {'id': 0, 'name': 'string'},
                    photo_urls: list = ['string'], tags: list = [{'id': 0, 'name': 'string'}], status='available'):
+        """
+        Sends pet update request with new pet's data
+        :param pet_id: pet_id of existing pet that should be updated
+        :param name: new pet's name
+        :param category: Optional. new pet's category
+        :param photo_urls: Optional. new photo URLs
+        :param tags: Optional. new tags
+        :param status: Optional. new status
+        :return: tuple with status_code and response's body
+        """
         pet = {'id': pet_id, 'category': category, 'name': name, 'photoUrls': photo_urls, 'tags': tags, 'status': status}
         return self.request('POST', 'pet', 'application/json', json.dumps(pet, ensure_ascii=False).encode('utf-8'))
 
     def pet_find_by_status(self, status='available'):
+        """
+        Sends pet find by status request
+        :param status: status to be searched. Must be one of following: ['available', 'pending', 'sold']
+        :return: tuple with status_code and response's body
+        """
         statuses = ['available', 'pending', 'sold']
         if status not in statuses:
             status = statuses[0]
         return self.request('GET', 'pet/' + status)
 
     def pet_find_by_id(self, pet_id: int):
+        """
+        Sends pet find by id request
+        :param pet_id: pet_id to be searched
+        :return: tuple with status_code and response's body
+        """
         return(self.request('GET', 'pet/' + str(pet_id)))
 
     def pet_update_by_id(self, pet_id: int, name: str = '', status='available'):
+        """
+        Sends pet update by id request
+        :param pet_id: pet_id
+        :param name: new pet's name
+        :param status: new status
+        :return: tuple with status_code and response's body
+        """
         if type(name) is not str:
             name = ''
         if type(status) is not str:
@@ -211,6 +326,12 @@ class PetStore:
         return self.request('POST', 'pet/' + str(pet_id), 'application/x-www-form-urlencoded', body)
 
     def pet_delete(self, pet_id: int, api_key: str = ''):
+        """
+        Sends pet delete request. WARNING. User must be authorized with vaild api_key
+        :param pet_id: pet_id that should be deleted
+        :param api_key: authorization key
+        :return: tuple with status_code and response's body
+        """
         if not api_key:
             api_key = 'special-key'
         body = {'pet_id': pet_id}
@@ -218,6 +339,15 @@ class PetStore:
 
     def store_create_order(self, pet_id: int, quantity: int = 0, ship_date: datetime = None, status: str = 'placed',
                            completed: bool = False):
+        """
+        Sends new order request
+        :param pet_id: Required.
+        :param quantity: Optional.
+        :param ship_date: Optional.
+        :param status: Optional.
+        :param completed: Optional.
+        :return: tuple with status_code and response's body
+        """
         completed = True if not quantity or not pet_id else completed
         order = {'id': 0, 'petId': pet_id, 'quantity': quantity, 'shipDate': self.parse_datetime(ship_date),
                  'status': status, 'complete': completed}
@@ -225,12 +355,26 @@ class PetStore:
         return self.request('POST', 'store/order', 'application/json', json.dumps(order, ensure_ascii=False))
 
     def store_find_order(self, order_id: int):
+        """
+        Sends find order by id request
+        :param order_id:
+        :return: tuple with status_code and response's body
+        """
         return self.request('GET', 'store/order/' + str(order_id))
 
     def store_delete_order(self, order_id: int):
+        """
+        Sends delete order request
+        :param order_id:
+        :return: tuple with status_code and response's body
+        """
         return self.request('DELETE', 'store/order/' + str(order_id))
 
     def store_inventory(self):
+        """
+        Sends store inventory request
+        :return: tuple with status_code and response's body
+        """
         return self.request('GET', 'store/inventory')
 
 
