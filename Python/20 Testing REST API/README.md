@@ -7,7 +7,7 @@
 | Папаметры строки: отсутствуют |  |
 | Параметры заголовков: `auth_key` | Тип &mdash; `string`, обязательный &mdash; да |
 
-<a "GET%20api_key.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/key" style="max-height: 800px;" /></a>
+<a href="GET%20api_key.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/key" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -34,7 +34,7 @@
 | Папаметры строки: отсутствуют                   |                                               |
 | Параметры заголовков: `email`, `password`       | Тип &mdash; `string`, обязательный &mdash; да |
 
-<a "GET%20api_pets.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/pets" style="max-height: 800px;" /></a>
+<a href="GET%20api_pets.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -61,7 +61,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age` | Тип &mdash; `string`, обязательный &mdash; да | 
 
-<a "POST%20api_create_pet_simple.svg" target="_blank"><img src="POST%20api_create_pet_simple.svg" title="Тестирование запроса POST /api/create_pet_simple" style="max-height: 800px;" /></a>
+<a href="POST%20api_create_pet_simple.svg" target="_blank"><img src="POST%20api_create_pet_simple.svg" title="Тестирование запроса POST /api/create_pet_simple" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -88,7 +88,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `pet_photo` | Тип &mdash; `file`, обязательный &mdash; да | 
 
-<a "POST%20api_pets_set_photo.svg" target="_blank"><img src="POST%20api_pets_set_photo.svg" title="Тестирование запроса POST /api/pets/set_photo" style="max-height: 800px;" /></a>
+<a href="POST%20api_pets_set_photo.svg" target="_blank"><img src="POST%20api_pets_set_photo.svg" title="Тестирование запроса POST /api/pets/set_photo" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -123,7 +123,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age`, `pet_photo` | Тип &mdash; `string`, (pet_photo &mdash; `file`) обязательный &mdash; да | 
 
-<a "POST%20api_pets.svg" target="_blank"><img src="POST%20api_pets.svg" title="Тестирование запроса POST /api/pets" style="max-height: 800px;" /></a>
+<a href="POST%20api_pets.svg" target="_blank"><img src="POST%20api_pets.svg" title="Тестирование запроса POST /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -157,7 +157,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age` | Тип &mdash; `string`, обязательный &mdash; да | 
 
-<a "PUT%20api_pets.svg" target="_blank"><img src="PUT%20api_pets.svg" title="Тестирование запроса PUT /api/pets" style="max-height: 800px;" /></a>
+<a href="PUT%20api_pets.svg" target="_blank"><img src="PUT%20api_pets.svg" title="Тестирование запроса PUT /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -192,7 +192,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age`, `pet_photo` | Тип &mdash; `string`, (pet_photo &mdash; `file`) обязательный &mdash; да | 
 
-<a "DELETE%20api_pets.svg" target="_blank"><img src="DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
+<a href="DELETE%20api_pets.svg" target="_blank"><img src="DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
