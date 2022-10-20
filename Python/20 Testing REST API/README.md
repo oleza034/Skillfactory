@@ -7,7 +7,7 @@
 | Папаметры строки: отсутствуют |  |
 | Параметры заголовков: `auth_key` | Тип &mdash; `string`, обязательный &mdash; да |
 
-<a href="GET%20api_key.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/key" style="max-height: 800px;" /></a>
+<a href="images/GET%20api_key.svg" target="_blank"><img src="images/GET%20api_pets.svg" title="Тестирование запроса GET /api/key" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -31,10 +31,10 @@
 | GET https://petfriends.skillfactory.ru/api/pets | Спецификации параметров                       |
 |:------------------------------------------------|:----------------------------------------------|
 | Параметры пути: отсутствуют                     |                                               |
-| Папаметры строки: отсутствуют                   |                                               |
-| Параметры заголовков: `email`, `password`       | Тип &mdash; `string`, обязательный &mdash; да |
+| Папаметры строки: `filter` | Тип &mdash; `string`, обязательный &mdash; нет |
+| Параметры заголовков: `auth_key` | Тип &mdash; `string`, обязательный &mdash; да |
 
-<a href="GET%20api_pets.svg" target="_blank"><img src="GET%20api_pets.svg" title="Тестирование запроса GET /api/pets" style="max-height: 800px;" /></a>
+<a href="images/GET%20api_pets.svg" target="_blank"><img src="images/GET%20api_pets.svg" title="Тестирование запроса GET /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -61,7 +61,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age` | Тип &mdash; `string`, обязательный &mdash; да | 
 
-<a href="POST%20api_create_pet_simple.svg" target="_blank"><img src="POST%20api_create_pet_simple.svg" title="Тестирование запроса POST /api/create_pet_simple" style="max-height: 800px;" /></a>
+<a href="images/POST%20api_create_pet_simple.svg" target="_blank"><img src="images/POST%20api_create_pet_simple.svg" title="Тестирование запроса POST /api/create_pet_simple" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -88,7 +88,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `pet_photo` | Тип &mdash; `file`, обязательный &mdash; да | 
 
-<a href="POST%20api_pets_set_photo.svg" target="_blank"><img src="POST%20api_pets_set_photo.svg" title="Тестирование запроса POST /api/pets/set_photo" style="max-height: 800px;" /></a>
+<a href="images/POST%20api_pets_set_photo.svg" target="_blank"><img src="images/POST%20api_pets_set_photo.svg" title="Тестирование запроса POST /api/pets/set_photo" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -152,12 +152,12 @@
 
 | PUT https://petfriends.skillfactory.ru/api/pets | Спецификации параметров |
 |:------------------------------------------------|:----------------------------------------------|
-| Параметры пути: отсутствуют                     |                                               |
+| Параметры пути: `pet_id` | Обязательный &mdash; да |
 | Папаметры строки: отсутствуют                   |                                               |
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age` | Тип &mdash; `string`, обязательный &mdash; да | 
 
-<a href="PUT%20api_pets.svg" target="_blank"><img src="PUT%20api_pets.svg" title="Тестирование запроса PUT /api/pets" style="max-height: 800px;" /></a>
+<a href="images/PUT%20api_pets.svg" target="_blank"><img src="images/PUT%20api_pets.svg" title="Тестирование запроса PUT /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -187,12 +187,12 @@
 
 | DELETE https://petfriends.skillfactory.ru/api/pets | Спецификации параметров |
 |:------------------------------------------------|:----------------------------------------------|
-| Параметры пути: отсутствуют                     |                                               |
-| Папаметры строки: `pet_id`                   |                                               |
+| Параметры пути: `pet_id`                        | Обязательный &mdash; да                                              |
+| Папаметры строки: отсутствуют                  |                                               |
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age`, `pet_photo` | Тип &mdash; `string`, (pet_photo &mdash; `file`) обязательный &mdash; да | 
 
-<a href="DELETE%20api_pets.svg" target="_blank"><img src="DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
+<a href="images/DELETE%20api_pets.svg" target="_blank"><img src="images/DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 20%;"><p>Примечание</p></th></tr></thead><tbody>
@@ -209,4 +209,3 @@
 <tr><td style="vertical-align: top;"><p><b>7.11.</b></p><p><span style="text-transform: capitalize; font-size:larger; text-color: #007;"><b>DELETE</b></span> https://petfriends.skillfactory.ru/api/pets/<code>pet_id</code></p><p>Headers:<br /><code>auth_key: строка 255 символов</code></p><p>Query params:<br /><code>pet_id</code> &mdash; корректное значение pet_id</p></td><td style="vertical-align: top;"><div style="text-align:left;"><ul><li>Код ответа 400 (Bad request)</li><li>Заголовки ответа:<ul><li>обязательно<ul><li><code>content-type: text/html charset=utf-8;</code></li><li><code>date: &lt;дата&gt;</code></li></ul></li><li>опционально:<ul><li><code>connection: keep-alive;</code></li><li><code>server: gunicorn/20.0.4</code></li><li><code>via: 1.1 vegur</code></li></ul></li></ul></li><li>Тело ответа: HTML код с сообщением о неверном значении auth_key</li><li>Время выполнения: не дольше 1с</li></ul></div></td><td style="vertical-align: top;"><p>Негативный тест с некорректным вводом</p></td></tr>
 <tr><td style="vertical-align: top;"><p><b>7.12.</b></p><p><span style="text-transform: capitalize; font-size:larger; text-color: #007;"><b>DELETE</b></span> https://petfriends.skillfactory.ru/api/pets/<code>pet_id</code></p><p>Headers:<br /><code>auth_key: строка &gt;1000 символов</code></p><p>Query params:<br /><code>pet_id</code> &mdash; корректное значение pet_id</p></td><td style="vertical-align: top;"><div style="text-align:left;"><ul><li>Код ответа 400 (Bad request)</li><li>Заголовки ответа:<ul><li>обязательно<ul><li><code>content-type: text/html charset=utf-8;</code></li><li><code>date: &lt;дата&gt;</code></li></ul></li><li>опционально:<ul><li><code>connection: keep-alive;</code></li><li><code>server: gunicorn/20.0.4</code></li><li><code>via: 1.1 vegur</code></li></ul></li></ul></li><li>Тело ответа: HTML код с сообщением о неверном значении auth_key</li><li>Время выполнения: не дольше 1с</li></ul></div></td><td style="vertical-align: top;"><p>Деструктивное тестирование</p></td></tr>
 <tr><td style="vertical-align: top;"><p><b>7.13.</b></p><p><span style="text-transform: capitalize; font-size:larger; text-color: #007;"><b>DELETE</b></span> https://petfriends.skillfactory.ru/api/pets/<code>pet_id</code></p><p>Headers:<br /><code>auth_key: число 3</code></p><p>Query params:<br /><code>pet_id</code> &mdash; корректное значение pet_id</p></td><td style="vertical-align: top;"><div style="text-align:left;"><ul><li>Код ответа 400 (Bad request)</li><li>Заголовки ответа:<ul><li>обязательно<ul><li><code>content-type: text/html charset=utf-8;</code></li><li><code>date: &lt;дата&gt;</code></li></ul></li><li>опционально:<ul><li><code>connection: keep-alive;</code></li><li><code>server: gunicorn/20.0.4</code></li><li><code>via: 1.1 vegur</code></li></ul></li></ul></li><li>Тело ответа: HTML код с сообщением о неверном значении auth_key</li><li>Время выполнения: не дольше 1с</li></ul></div></td><td style="vertical-align: top;"><p>Деструктивное тестирование</p></td></tr>
-</tbody></table>
