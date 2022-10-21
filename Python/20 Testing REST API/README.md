@@ -3,9 +3,9 @@
 ## 1. Тестирование запроса /api/key
 | GET https://petfriends.skillfactory.ru/api/pets | Спецификации параметров |
 |:-----------------------------------------------|:----------------------------------------------|
-| Параметры пути: `filter` | Тип &mdash; `string`, обязательный &mdash; нет, значение = `my_pets` |
+| Параметры пути: отсутствуют |  |
 | Папаметры строки: отсутствуют |  |
-| Параметры заголовков: `auth_key` | Тип &mdash; `string`, обязательный &mdash; да |
+| Параметры заголовков: `email`, `password` | Тип &mdash; `string`, обязательный &mdash; да |
 
 <a href="images/GET%20api_key.svg" target="_blank"><img src="images/GET%20api_key.svg" title="Тестирование запроса GET /api/key" style="max-width: 50%;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
