@@ -75,34 +75,18 @@ def test_1_positive(api_key=auth_key, filename=correct_photo, pet_id='correct_id
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 200
+    assert headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
     assert chk_structure(resp) == ''
     assert check_pet(resp, pet['name'], pet['animal_type'], pet['age'], 'data:' + f[2] + ';base64,*')
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_2_wrong_auth_key(api_key='asdf', filename=correct_photo, pet_id='correct_id'):
-    pet_id, pet = get_pet_id(pet_id) # get real pet's data
-    #check pet we're about to change
-    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
-    # try to load photo
-    try:
-        f = get_photo(filename)
-    except Exception as e:
-        assert str(e) == '' # read error message
-    # prepare and send request to add photo
-    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
-    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
-    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
-    assert status == 403
-    assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
-
-
-def test_3_expired_auth_key(api_key=expired_api_key, filename=correct_photo, pet_id='correct_id'):
+def test_2_expired_auth_key(api_key=expired_api_key, filename=correct_photo, pet_id='correct_id'):
     assert expired_api_key
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
@@ -115,14 +99,37 @@ def test_3_expired_auth_key(api_key=expired_api_key, filename=correct_photo, pet
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_4_missing_auth_key(api_key=None, filename=correct_photo, pet_id='correct_id'):
+def test_3_empty_auth_key(api_key='', filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_4_missing_auth_key(filename=correct_photo, pet_id='correct_id'):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -134,27 +141,173 @@ def test_4_missing_auth_key(api_key=None, filename=correct_photo, pet_id='correc
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_5_no_photo(api_key=auth_key, pet_id='correct_id'):
+def test_5_wrong_auth_key(api_key='asdf', filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_6_auth_key_255(api_key=rnd_str(255), filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_7_auth_key_1025(api_key=rnd_str(1025), filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_8_auth_key_symbols(api_key=rnd_str(15, 's'), filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_9_auth_key_non_ascii(api_key=rnd_str(15, 'ru'), filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_10_numeric_auth_key(api_key=12345678, filename=correct_photo, pet_id='correct_id'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_11_no_photo(api_key=auth_key, pet_id='correct_id'):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
     # prepare and send request to add photo
     headers = {'Content-Type': 'multipart/form-data', 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_6_large_photo(api_key=auth_key, pet_id='correct_id', filename=large_photo):
+def test_12_empty_photo(api_key=auth_key, pet_id='correct_id', pet_photo=''):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # prepare and send request to add photo
+    body = MultipartEncoder({'pet_photo': pet_photo})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 400
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_13_large_photo(api_key=auth_key, pet_id='correct_id', filename=large_photo):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -166,14 +319,16 @@ def test_6_large_photo(api_key=auth_key, pet_id='correct_id', filename=large_pho
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_7_text_file(api_key=auth_key, pet_id='correct_id', filename=text_file):
+def test_14_text_file(api_key=auth_key, pet_id='correct_id', filename=text_file):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -185,14 +340,16 @@ def test_7_text_file(api_key=auth_key, pet_id='correct_id', filename=text_file):
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_8_broken_file(api_key=auth_key, pet_id='correct_id', broken_file=broken_photo()):
+def test_15_broken_file(api_key=auth_key, pet_id='correct_id', broken_file=broken_photo()):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -200,14 +357,16 @@ def test_8_broken_file(api_key=auth_key, pet_id='correct_id', broken_file=broken
     body=MultipartEncoder(fields={'pet_photo': ('pet_photo.jpg', broken_file, 'image/jpg')})
     print(body)
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_9_text_instead_of_file(api_key=auth_key, pet_id='correct_id', filename=rnd_str(255)):
+def test_16_text_instead_of_file(api_key=auth_key, pet_id='correct_id', filename=rnd_str(255)):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -219,43 +378,80 @@ def test_9_text_instead_of_file(api_key=auth_key, pet_id='correct_id', filename=
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': filename})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_10_special_symbols_instead_photo(api_key=auth_key, pet_id='correct_id', filename=rnd_str(15, 's')):
+def test_17_special_symbols_instead_photo(api_key=auth_key, pet_id='correct_id', filename=rnd_str(15, 's')):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': filename})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_11_non_ascii_symbols_instead_photo(api_key=auth_key, pet_id='correct_id', filename=rnd_str(255, 'ru')):
+def test_18_non_ascii_symbols_instead_photo(api_key=auth_key, pet_id='correct_id', filename=rnd_str(255, 'ru')):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': filename})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_12_wrong_ct_type(api_key=auth_key, pet_id='correct_id', filename=correct_photo,
-                          ct_type='application/x-www-form-urlencoded'):
+def test_19_number_instead_photo(api_key=auth_key, pet_id='correct_id', filename=123868):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': str(filename)})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 400
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_20_wrong_method(method='put', api_key=auth_key, pet_id='correct_id', filename=correct_photo):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': filename})
+    headers = {'Content-Type': body.content_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request(method, 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 405
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_21_missing_ct_type(api_key=auth_key, filename=correct_photo, pet_id='correct_id', ct_type='application/json'):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -266,15 +462,17 @@ def test_12_wrong_ct_type(api_key=auth_key, pet_id='correct_id', filename=correc
         assert str(e) == '' # read error message
     # prepare and send request to add photo
     body={'pet_photo': f if f[0] else ''}
-    headers = {'Content-Type': ct_type, 'auth_key': api_key}
-    t = datetime.now()
+    headers = {'auth_key': api_key}
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_13_multiple_ct_type_values(api_key=auth_key, pet_id='correct_id', filename=correct_photo,
+def test_22_multiple_ct_type_values(api_key=auth_key, pet_id='correct_id', filename=correct_photo,
                                     ct_type='text/plain; application/x-www-form-urlencoded; application/json'):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
@@ -287,14 +485,186 @@ def test_13_multiple_ct_type_values(api_key=auth_key, pet_id='correct_id', filen
     # prepare and send request to add photo
     body={'pet_photo': f if f[0] else ''}
     headers = {'Content-Type': ct_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_23_wrong_ct_type(api_key=auth_key, pet_id='correct_id', filename=correct_photo,
+                          ct_type='application/x-www-form-urlencoded'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_14_pet_of_different_user(api_key=get_key(2), pet_id='correct_id', filename=correct_photo):
+def test_24_different_ct_type(api_key=auth_key, filename=correct_photo, pet_id='correct_id',
+                                       ct_type='application/x-www-form-urlencoded'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 400
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_25_different_ct_type(api_key=auth_key, filename=correct_photo, pet_id='correct_id', ct_type='application/json'):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 400
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_26_ct_type_255(api_key=auth_key, pet_id='correct_id', filename=correct_photo, ct_type=rnd_str(255)):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_27_ct_type_1025(api_key=auth_key, pet_id='correct_id', filename=correct_photo, ct_type=rnd_str(1025)):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_28_ct_type_symbols(api_key=auth_key, pet_id='correct_id', filename=correct_photo, ct_type=rnd_str(15, 's')):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_29_ct_type_non_ascii(api_key=auth_key, pet_id='correct_id', filename=correct_photo, ct_type=rnd_str(15, 'ru')):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_30_numberic_ct_type(api_key=auth_key, pet_id='correct_id', filename=correct_photo, ct_type=1657328):
+    pet_id, pet = get_pet_id(pet_id) # get real pet's data
+    #check pet we're about to change
+    assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
+    # try to load photo
+    try:
+        f = get_photo(filename)
+    except Exception as e:
+        assert str(e) == '' # read error message
+    # prepare and send request to add photo
+    body={'pet_photo': f if f[0] else ''}
+    headers = {'Content-Type': ct_type, 'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_31_pet_of_different_user(api_key=get_key(2), pet_id='correct_id', filename=correct_photo):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -306,14 +676,16 @@ def test_14_pet_of_different_user(api_key=get_key(2), pet_id='correct_id', filen
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_15_no_pet_id(api_key=auth_key, filename=correct_photo):
+def test_32_no_pet_id(api_key=auth_key, filename=correct_photo):
     # try to load photo
     try:
         f = get_photo(filename)
@@ -322,14 +694,16 @@ def test_15_no_pet_id(api_key=auth_key, filename=correct_photo):
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/', headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 400
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_16_incorrect_pet_id(api_key=auth_key, pet_id='asdf', filename=correct_photo):
+def test_33_incorrect_pet_id(api_key=auth_key, pet_id='asdf', filename=correct_photo):
     # try to load photo
     try:
         f = get_photo(filename)
@@ -338,14 +712,16 @@ def test_16_incorrect_pet_id(api_key=auth_key, pet_id='asdf', filename=correct_p
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_17_pet_id_255_symbols(api_key=auth_key, pet_id=rnd_str(255), filename=correct_photo):
+def test_34_pet_id_255_symbols(api_key=auth_key, pet_id=rnd_str(255), filename=correct_photo):
     pet_id, pet = get_pet_id(pet_id) # get real pet's data
     #check pet we're about to change
     assert pet_id and type(pet) == dict and 'id' in pet.keys() and pet['id'] == pet_id
@@ -357,14 +733,16 @@ def test_17_pet_id_255_symbols(api_key=auth_key, pet_id=rnd_str(255), filename=c
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_18_pet_id_1025_symbols(api_key=auth_key, pet_id=rnd_str(1025), filename=correct_photo):
+def test_35_pet_id_1025_symbols(api_key=auth_key, pet_id=rnd_str(1025), filename=correct_photo):
     # try to load photo
     try:
         f = get_photo(filename)
@@ -373,14 +751,16 @@ def test_18_pet_id_1025_symbols(api_key=auth_key, pet_id=rnd_str(1025), filename
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + pet_id, headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_19_pet_id_special_symbols(api_key=auth_key, pet_id=rnd_str(15, 's'), filename=correct_photo):
+def test_36_pet_id_special_symbols(api_key=auth_key, pet_id=rnd_str(15, 's'), filename=correct_photo):
     # try to load photo
     try:
         f = get_photo(filename)
@@ -389,14 +769,16 @@ def test_19_pet_id_special_symbols(api_key=auth_key, pet_id=rnd_str(15, 's'), fi
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + quote_plus(pet_id), headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_20_(api_key=auth_key, pet_id=rnd_str(15, 'ru'), filename=correct_photo):
+def test_37_non_ascii_pet_id(api_key=auth_key, pet_id=rnd_str(15, 'ru'), filename=correct_photo):
     # try to load photo
     try:
         f = get_photo(filename)
@@ -405,8 +787,10 @@ def test_20_(api_key=auth_key, pet_id=rnd_str(15, 'ru'), filename=correct_photo)
     # prepare and send request to add photo
     body=MultipartEncoder(fields={'pet_photo': f if f[0] else ''})
     headers = {'Content-Type': body.content_type, 'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('post', 'api/pets/set_photo/' + quote_plus(pet_id), headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)

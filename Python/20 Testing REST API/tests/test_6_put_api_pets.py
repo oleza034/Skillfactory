@@ -68,15 +68,17 @@ def test_1_positive(api_key = auth_key):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 200
     assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
     assert 'id' in resp.keys() and resp['id'] == pet['id']
     assert 'name' in resp.keys() and resp['name'] == name
     assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
     assert 'age' in resp.keys() and resp['age'] == str(age)
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
 def test_2_positive_unicode(api_key = auth_key):
@@ -90,18 +92,231 @@ def test_2_positive_unicode(api_key = auth_key):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 200
     assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
     assert 'id' in resp.keys() and resp['id'] == pet['id']
     assert 'name' in resp.keys() and resp['name'] == name
     assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
     assert 'age' in resp.keys() and resp['age'] == str(age)
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_3_pet_id_of_another_user(api_key = auth_key):
+def test_3_empty_name(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = '', rnd_str(255), rnd_str(255)
+    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == pet['name']
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
+    assert 'age' in resp.keys() and resp['age'] == age
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_4_empty_animal_type(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = rnd_str(255), '', rnd_str(255)
+    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == name
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == pet['animal_type']
+    assert 'age' in resp.keys() and resp['age'] == str(age)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_5_empty_age(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = rnd_str(255), rnd_str(255), ''
+    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == name
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
+    assert 'age' in resp.keys() and resp['age'] == pet['age']
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_6_empty_name_type_age(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = '', '', ''
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == pet['name']
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == pet['animal_type']
+    assert 'age' in resp.keys() and resp['age'] == pet['age']
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_7_data_1025(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = rnd_str(1025), rnd_str(1025), rnd_str(1025)
+    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == name
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
+    assert 'age' in resp.keys() and resp['age'] == str(age)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_8_spec_symbols(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = rnd_str(15, 's'), rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == name
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
+    assert 'age' in resp.keys() and resp['age'] == str(age)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_9_missing_data(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == pet['name']
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == pet['animal_type']
+    assert 'age' in resp.keys() and resp['age'] == pet['age']
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_10_missing_age(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == name
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
+    assert 'age' in resp.keys() and resp['age'] == pet['age']
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_11_numeric_data(api_key = auth_key):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+    # get new pet's data
+    name, animal_type, age = 123, 456, 987
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 200
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'application/json'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert 'id' in resp.keys() and resp['id'] == pet['id']
+    assert 'name' in resp.keys() and resp['name'] == str(name)
+    assert 'animal_type' in resp.keys() and resp['animal_type'] == str(animal_type)
+    assert 'age' in resp.keys() and resp['age'] == str(age)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_12_pet_id_of_another_user(api_key = auth_key):
     # get 1st pet
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
@@ -114,36 +329,42 @@ def test_3_pet_id_of_another_user(api_key = auth_key):
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     # authorize as another user
     headers = global_headers | {'auth_key': get_key(2)}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_4_missing_pet_id(api_key = auth_key):
+def test_13_missing_pet_id(api_key = auth_key):
     name, animal_type, age = new_name('', '', None)
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
-    status, headers, _ = request('put', path[:-1], headers=headers, body=body)
-    assert status == 400
-    assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
-
-
-def test_5_empty_pet_id(api_key = auth_key):
-    name, animal_type, age = new_name('', '', None)
-    body = {'name': name, 'animal_type': animal_type, 'age': age}
-    headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path, headers=headers, body=body)
-    assert status == 400
+    t2 = datetime.utcnow()
+    assert status == 404
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_6_wrong_auth_key(api_key = rnd_str(255)):
+def test_14_empty_pet_id(api_key = auth_key):
+    name, animal_type, age = new_name('', '', None)
+    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
+    status, headers, _ = request('put', path, headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 404
+    assert headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_15_wrong_auth_key(api_key = rnd_str(255)):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
@@ -154,14 +375,16 @@ def test_6_wrong_auth_key(api_key = rnd_str(255)):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_7_auth_key_1025_symbols(api_key = rnd_str(1025)):
+def test_16_auth_key_1025_symbols(api_key = rnd_str(1025)):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
@@ -172,14 +395,16 @@ def test_7_auth_key_1025_symbols(api_key = rnd_str(1025)):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_8_auth_key_special_symbols(api_key = rnd_str(15, 's')):
+def test_17_auth_key_special_symbols(api_key = rnd_str(15, 's')):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
@@ -190,14 +415,16 @@ def test_8_auth_key_special_symbols(api_key = rnd_str(15, 's')):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_9_auth_key_non_ascii(api_key = rnd_str(54, 'ru')):
+def test_18_auth_key_non_ascii(api_key = rnd_str(54, 'ru')):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
@@ -208,14 +435,16 @@ def test_9_auth_key_non_ascii(api_key = rnd_str(54, 'ru')):
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_10_expired_auth_key(api_key = expired_api_key):
+def test_19_expired_auth_key(api_key = expired_api_key):
     if not api_key:
         assert api_key == 'expired_auth_key'
     pet = get_pet()
@@ -227,15 +456,17 @@ def test_10_expired_auth_key(api_key = expired_api_key):
     name, animal_type, age = new_name(pet['name'], pet['animal_type'], pet['age'])
     assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
     body = {'name': name, 'animal_type': animal_type, 'age': age}
-    t = datetime.now()
     headers = global_headers | {'auth_key': api_key}
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_11_missing_auth_key():
+def test_20_missing_auth_key():
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
@@ -248,176 +479,284 @@ def test_11_missing_auth_key():
     headers = global_headers | {}
     if 'auth_key' in headers.keys():
         headers.pop('auth_key')
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, _ = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
     assert status == 403
     assert headers['Content-Type'] == 'text/html; charset=utf-8'
-    assert datetime.now() - t < timedelta(seconds=1)
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_12_missing_name(api_key = auth_key):
+def test_21_auth_key_empty(api_key = ''):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
-    name, animal_type, age = new_name(pet['name'], pet['animal_type'], pet['age'])
-    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
-    body = {'animal_type': animal_type, 'age': age}
-    headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
-    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json'
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == pet['name']
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
-    assert 'age' in resp.keys() and resp['age'] == str(age)
-    assert datetime.now() - t < timedelta(seconds=1)
-
-
-def test_13_missing_animal_type(api_key = auth_key):
-    pet = get_pet()
-    #check we've got correct pet. Otherwise display error message
-    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
-        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
-    assert pet['id']
-    # get new pet's data
-    name, animal_type, age = new_name(pet['name'], pet['animal_type'], pet['age'])
-    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
-    body = {'name': name, 'age': age}
-    headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
-    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json'
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == name
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == pet['animal_type']
-    assert 'age' in resp.keys() and resp['age'] == str(age)
-    assert datetime.now() - t < timedelta(seconds=1)
-
-
-def test_14_missing_age(api_key = auth_key):
-    pet = get_pet()
-    #check we've got correct pet. Otherwise display error message
-    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
-        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
-    assert pet['id']
-    # get new pet's data
-    name, animal_type, age = new_name(pet['name'], pet['animal_type'], pet['age'])
-    assert name != pet['name'] and animal_type != pet['animal_type'] and age != pet['age']
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
     body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json'
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == name
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == animal_type
-    assert 'age' in resp.keys() and resp['age'] == str(pet['age'])
-    assert datetime.now() - t < timedelta(seconds=1)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_15_missing_body(api_key = auth_key):
+def test_22_auth_key_255(api_key = rnd_str(255)):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
-    status, headers, resp = request('put', path + pet['id'], headers=headers)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json'
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == pet['name']
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == pet['animal_type']
-    assert 'age' in resp.keys() and resp['age'] == str(pet['age'])
-    assert datetime.now() - t < timedelta(seconds=1)
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_16_parameters_str_of_255(api_key = auth_key):
+def test_23_auth_key_1025(api_key = rnd_str(1025)):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
-    body = {'name': rnd_str(255), 'animal_type': rnd_str(255), 'age': rnd_str(255)}
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json'
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == body['name']
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == body['animal_type']
-    assert 'age' in resp.keys() and resp['age'] == body['age']
-    assert datetime.now() - t < timedelta(seconds=1)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_17_parameters_str_1025(api_key = auth_key):
+def test_24_auth_key_special_symbols(api_key = rnd_str(15, 's')):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
-    name, animal_type, age = rnd_str(1025), rnd_str(1025), rnd_str(1025)
-    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json' and type(resp) == dict
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == body['name']
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == body['animal_type']
-    assert 'age' in resp.keys() and resp['age'] == body['age']
-    assert datetime.now() - t < timedelta(seconds=1)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_18_parameters_spec_symbols(api_key = auth_key):
+def test_25_auth_key_non_ascii(api_key = rnd_str(15, 'ru')):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
-    name, animal_type, age = rnd_str(15, 's'), rnd_str(15, 's'), rnd_str(15, 's')
-    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json' and type(resp) == dict
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == body['name']
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == body['animal_type']
-    assert 'age' in resp.keys() and resp['age'] == body['age']
-    assert datetime.now() - t < timedelta(seconds=1)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
 
 
-def test_19_parameters_numbers(api_key = auth_key):
+def test_26_numeric_auth_key(api_key = 123467):
     pet = get_pet()
     #check we've got correct pet. Otherwise display error message
     if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
         assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
     assert pet['id']
     # get new pet's data
-    name, animal_type, age = 123, 456, 987
-    body = {'name': name, 'animal_type': animal_type, 'age': age}
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
     headers = global_headers | {'auth_key': api_key}
-    t = datetime.now()
+    t = datetime.utcnow()
     status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
-    assert status == 200
-    assert headers['Content-Type'] == 'application/json' and type(resp) == dict
-    assert 'id' in resp.keys() and resp['id'] == pet['id']
-    assert 'name' in resp.keys() and resp['name'] == str(name)
-    assert 'animal_type' in resp.keys() and resp['animal_type'] == str(animal_type)
-    assert 'age' in resp.keys() and resp['age'] == str(age)
-    assert datetime.now() - t < timedelta(seconds=1)
+    t2 = datetime.utcnow()
+    assert status == 403
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_27_missing_ct_type(api_key = auth_key, ct_type = None):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_28_multiple_ct_type(api_key = auth_key, ct_type = 'text/html; application/json; multipart/form-data'):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_29_ct_type_255(api_key = auth_key, ct_type = rnd_str(255)):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_30_ct_type_1025(api_key = auth_key, ct_type = rnd_str(1025)):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_31_ct_type_special_symbols(api_key = auth_key, ct_type = rnd_str(15, 's')):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_32_ct_type(api_key = auth_key, ct_type = rnd_str(15, 'ru')):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)
+
+
+def test_33_numeric_ct_type(api_key = auth_key, ct_type = 12345):
+    pet = get_pet()
+    #check we've got correct pet. Otherwise display error message
+    if 'id' not in pet.keys() or 'name' not in pet.keys() or 'animal_type' not in pet.keys() or 'age' not in pet.keys():
+        assert pet == {'id': '*', 'name': '*', 'animal_type': '*', 'age': '*'}
+    assert pet['id']
+   # get new pet's data
+    name, animal_type = rnd_str(15, 's'), rnd_str(15, 's')
+    assert name != pet['name'] and animal_type != pet['animal_type']
+    body = {'name': name, 'animal_type': animal_type}
+    headers = global_headers | {'auth_key': api_key}
+    if ct_type != None:
+        headers['Content-Type'] = ct_type
+    t = datetime.utcnow()
+    status, headers, resp = request('put', path + pet['id'], headers=headers, body=body)
+    t2 = datetime.utcnow()
+    assert status == 415
+    assert 'Content-Type' in headers.keys() and headers['Content-Type'] == 'text/html; charset=utf-8'
+    assert t2 - datetime.strptime(headers['Date'], '%a, %d %b %Y %H:%M:%S %Z') < timedelta(minutes=1)
+    assert t2 - t < timedelta(seconds=1)

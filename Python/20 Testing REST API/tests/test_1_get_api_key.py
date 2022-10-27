@@ -56,7 +56,8 @@ def test_1_6_get_api_key_no_email_pw():
     assert datetime.now() - t < timedelta(seconds=1)
 
 
-def test_1_7_get_api_key_wrong_ct_type(email=valid_email, password=valid_password, content_type='multipart/form-data'):
+def test_1_7_get_api_key_wrong_ct_type(email=valid_email, password=valid_password, content_type='text/html; applica' \
+                                      'tion/json; multipart/form-data; application/x-www-form-urlencoded'):
     headers = {'Content-Type': content_type, 'email': email, 'password': password}
     t = datetime.now()
     status, headers, resp = request('GET', 'api/key', headers=headers)
