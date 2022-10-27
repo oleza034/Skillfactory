@@ -7,7 +7,7 @@
 | Параметры заголовков: `auth_key`       | Тип &mdash; `string`, обязательный &mdash; да |
 | Тело запроса: `name`, `animal_type`, `age`, `pet_photo` | Тип &mdash; `string`, (pet_photo &mdash; `file`) обязательный &mdash; да | 
 
-<a href="images/DELETE%20api_pets.svg" target="_blank"><img src="../images/DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
+<a href="../images/DELETE%20api_pets.svg" target="_blank"><img src="../images/DELETE%20api_pets.svg" title="Тестирование запроса DELETE /api/pets" style="max-height: 800px;" /></a>
 ### ЧЕК-ЛИСТ ПРОВЕРОК ДЛЯ ЗАПРОСА
 <div style="text-align:left; vertical-align:text-top;"><table>
     <thead><tr><th style="text-align:left; width: 35%;"><p>Вызов API</p></th><th style="text-align:left; width: 45%;"><p>Результат выполнения запроса</p></th><th style="text-align:left; width: 25%;"><p>Результат теста</p></th></tr></thead><tbody>
