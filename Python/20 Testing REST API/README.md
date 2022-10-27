@@ -8,7 +8,7 @@
 5. [Тестирование запроса POST /api/pets](tests/5_post_api_pets.md)
 6. [Тестирование запроса PUT /api/pets](tests/6_put_api_pets.md)
 7. [Тестирование запроса DELETE /api/pets](tests/7_delete_api_pets.md)
-8. [Пользовательское тестирование](user_tests.md) (не имплементирован *пока* на Python)
+8. [Пользовательские сценарии тестирования](user_tests.md) (не имплементирован *пока* на Python)
 
 ## Структура проекта
 - Файлы `api.py`, `settings.py` - файлы проекта
