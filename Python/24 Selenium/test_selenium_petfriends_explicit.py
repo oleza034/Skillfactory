@@ -1,13 +1,16 @@
-import random
+import os
+import platform
+# import random
 
 import selenium.common.exceptions
 from selenium import webdriver
+from selenium.webdriver.safari.options import Options as SafariOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pytest
-from settings import base_url, chrome_cfg_options, firefox_cfg_options, edge_cfg_options, default_timeout, \
-    valid_email, valid_password
+from settings import base_url, chrome_cfg_options, firefox_cfg_options, edge_cfg_options, safari_cfg_options, \
+    default_timeout, valid_email, valid_password
 
 
 def wait_find_element(driver: (webdriver.Chrome | webdriver.Edge | webdriver.Firefox), locator,
@@ -24,7 +27,7 @@ def wait_find_element(driver: (webdriver.Chrome | webdriver.Edge | webdriver.Fir
     return WebDriverWait(driver, timeout).until(cond)
 
 
-@pytest.fixture(params=['chrome', 'firefox', 'edge'], scope='function')
+@pytest.fixture(params=['chrome', 'firefox', 'edge', 'safari'], scope='function',)
 # @pytest.fixture(params=['firefox'], scope='function')
 def init_driver(request):
     """
@@ -40,8 +43,18 @@ def init_driver(request):
     elif request.param == 'edge':
         edge_options = edge_cfg_options(webdriver.EdgeOptions())
         web_driver = webdriver.Edge(options=edge_options)
+    elif request.param == 'safari':
+        safari_options = safari_cfg_options(SafariOptions())
+        if safari_options:
+            web_driver = webdriver.Safari(options=safari_options)
+        else:
+            web_driver = None
+    if web_driver:
+        web_driver.maximize_window()
+
     yield web_driver
-    web_driver.close()
+    if web_driver:
+        web_driver.close()
 
 
 @pytest.mark.usefixtures('init_driver')
@@ -50,6 +63,9 @@ def my_pets(init_driver):
     """
     login user and load my_pets page
     """
+    if not init_driver:
+        return None
+
     init_driver.get(base_url + 'login')
 
     # add email
@@ -81,7 +97,9 @@ def my_pets(init_driver):
 
 
 @pytest.mark.usefixtures('my_pets')
-def test_1(my_pets: (webdriver.Chrome | webdriver.Edge | webdriver.Firefox)):
+def test_1(my_pets: (webdriver.Chrome | webdriver.Edge | webdriver.Firefox | SafariOptions)):
+    if not my_pets:
+        return True
     assert my_pets.current_url == base_url + 'my_pets'
     txt = wait_find_element(my_pets, (By.XPATH, '//div[contains(@class,".col-sm-4")]')).text
     animal_count = int(txt[txt.index(' ', txt.index('Питомцев:')) + 1:txt.index('\n', txt.index('Питомцев:'))])
