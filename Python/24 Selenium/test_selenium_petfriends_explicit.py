@@ -13,7 +13,7 @@ from settings import base_url, chrome_cfg_options, firefox_cfg_options, edge_cfg
     default_timeout, valid_email, valid_password
 
 
-def wait_find_element(driver: (webdriver.Chrome | webdriver.Edge | webdriver.Firefox), locator,
+def wait_find_element(driver: (webdriver.Chrome | webdriver.Edge | webdriver.Firefox | webdriver.Safari), locator,
                       condition: str = None, timeout: int = default_timeout):
     if condition not in ['elem_visibility', 'presence_of_all', 'elem_clickable']:
         cond = EC.presence_of_element_located(locator)
@@ -27,8 +27,8 @@ def wait_find_element(driver: (webdriver.Chrome | webdriver.Edge | webdriver.Fir
     return WebDriverWait(driver, timeout).until(cond)
 
 
-@pytest.fixture(params=['chrome', 'firefox', 'edge', 'safari'], scope='function',)
-# @pytest.fixture(params=['firefox'], scope='function')
+# REMOVE 'safari' when testing not on Mac
+@pytest.fixture(params=['chrome', 'firefox', 'edge'], scope='function')  # , 'safari'], scope='function')
 def init_driver(request):
     """
     initialize webdriver
@@ -45,16 +45,12 @@ def init_driver(request):
         web_driver = webdriver.Edge(options=edge_options)
     elif request.param == 'safari':
         safari_options = safari_cfg_options(SafariOptions())
-        if safari_options:
-            web_driver = webdriver.Safari(options=safari_options)
-        else:
-            web_driver = None
-    if web_driver:
-        web_driver.maximize_window()
+        assert safari_options, 'Cannot run test with Safari browser. Make sure you\'re using Mac with Safari browser'
+        web_driver = webdriver.Safari(options=safari_options)
 
     yield web_driver
-    if web_driver:
-        web_driver.close()
+
+    web_driver.close()
 
 
 @pytest.mark.usefixtures('init_driver')
@@ -64,7 +60,7 @@ def my_pets(init_driver):
     login user and load my_pets page
     """
     if not init_driver:
-        return None
+        return False
 
     init_driver.get(base_url + 'login')
 

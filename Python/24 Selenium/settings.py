@@ -60,14 +60,14 @@ def firefox_cfg_options(firefox_options: webdriver.FirefoxOptions):
 
 def edge_cfg_options(edge_options: webdriver.EdgeOptions):
     edge_options.binary = edge_location
-    edge_options.headless = True
+    # edge_options.headless = True
     edge_options.add_argument('disable-gpu')
     return edge_options
 
 def safari_cfg_options(safari_options: SafariOptions):
     if safari_driver:
         safari_options.add_argument('-headless')
-        safari_options.headless = True
+        # safari_options.headless = True
         return safari_options
     else:
         return None

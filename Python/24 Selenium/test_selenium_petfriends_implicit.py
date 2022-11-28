@@ -1,12 +1,13 @@
 import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.safari.options import Options as SafariOptions
 import pytest
 from settings import base_url, chrome_cfg_options, firefox_cfg_options, edge_cfg_options, valid_email, valid_password, \
-    default_timeout
+    default_timeout, safari_cfg_options
 
 
-@pytest.fixture(params=['chrome', 'firefox', 'edge'], scope='function')
+@pytest.fixture(params=['chrome', 'firefox', 'edge'], scope='function')  # , 'safari'], scope='function')
 def init_driver(request):
     """
     initialize webdriver
@@ -14,13 +15,20 @@ def init_driver(request):
     web_driver = None
     if request.param == 'firefox':
         firefox_options = firefox_cfg_options(webdriver.FirefoxOptions())
+        assert firefox_options, 'Cannot run test on Firefox browser'
         web_driver = webdriver.Firefox(options=firefox_options)
     elif request.param == 'chrome':
         chrome_options = chrome_cfg_options(webdriver.ChromeOptions())
+        assert chrome_options, 'Cannot run test on Chrome browser'
         web_driver = webdriver.Chrome(options=chrome_options)
     elif request.param == 'edge':
         edge_options = edge_cfg_options(webdriver.EdgeOptions())
+        assert edge_options, 'Cannot run test on Safari browser'
         web_driver = webdriver.Edge(options=edge_options)
+    elif request.param == 'safari':
+        safari_options = safari_cfg_options(SafariOptions())
+        assert safari_options, 'Cannot run test on Safari browser'
+        web_driver = webdriver.Safari(options=safari_options)
     web_driver.implicitly_wait(default_timeout)
 
     yield web_driver
