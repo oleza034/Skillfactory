@@ -1,4 +1,6 @@
 # Testing PetFriends in Selenium
+
+## Desctiption
 Testing site with different browsers. Tasks:
 - [login user](https://petfriends.skillfactory.ru/login)
 - open [my_pets](https://petfriends.skillfactory.ru/my_pets) page when user is logged in
@@ -10,3 +12,18 @@ Testing site with different browsers. Tasks:
  - All pets names are unique, there are no pets with the same name.
 - make tests with implicit waiters
 - make tests with explicit waiters
+
+***IMPORTANT***: Project has missing `.env` file with sensitive data. Please create one before using tests. Contents of .env:
+``` Python
+valid_email = "your@vaild.email"
+valid_password = "yourP@$$w0rd"
+```
+If you don't have an account on site, please create one.
+
+## Environment
+To run tests, you must have the followind modules installed, for Python 3.11:
+- Pytest
+- Pytest-Selenium
+- Python-Dotenv
+
+Also, you must have installed browsers and their Selenium drivers. Make sure paths in [settings.py](settings.py) point to your actual browsers or drivers
