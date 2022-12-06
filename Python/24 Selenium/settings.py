@@ -64,6 +64,7 @@ def edge_cfg_options(edge_options: webdriver.EdgeOptions):
     edge_options.add_argument('disable-gpu')
     return edge_options
 
+
 def safari_cfg_options(safari_options: SafariOptions):
     if safari_driver:
         safari_options.add_argument('-headless')
