@@ -1,13 +1,13 @@
 import selenium.webdriver.remote.webelement
 
-from base_page import WebPage
-from locators import RegLocators as Loc
+from Pages.base_page import WebPage
+from Pages.locators import RegLocators as Loc
 from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from settings import DEFAULT_TIMEOUT, AUTH_COOKIES, BASE_URL, LOGGED, rnd
-from elements import WebElement, ManyWebElements
+from Pages.elements import WebElement, ManyWebElements
 from time import sleep
 
 class RegPage(WebPage):

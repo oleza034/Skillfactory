@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from settings import DEFAULT_TIMEOUT, LOGGED, TIME_FORMAT, SLEEP_TIME, log_folder, log_file_name
 from logger import Logger, MyCookies
-from elements import WebElement
+from Pages.elements import WebElement
 from pathlib import Path
 from datetime import datetime
 
@@ -22,10 +22,10 @@ class WebPage(object):
     _cookies: (MyCookies | None) = None
     log = None
     _timeout = 0
-    logged = False
+    logged = LOGGED
+    log_file_name = ''
     log_location = ''
-    screenshot_location = ''
-    _screenshots = []
+    _screenshot_number = 1
 
     def __init__(self, web_driver: selenium.webdriver, url='about:blank', timeout: float = DEFAULT_TIMEOUT,
                  cookies_file = 'page_coolies.dat', logged = LOGGED, log_prefix = ''):
@@ -39,9 +39,11 @@ class WebPage(object):
         self.get(url, False)
         if logged:
             # get timed file / folder names for logs and screenshots. Add module name if needed (log_prefix)
-            self.log_location = log_file_name % (log_prefix + '_' if log_prefix else '')
-            self.screenshot_location = log_folder % (log_prefix + '_' if log_prefix else '')
-            self.log = Logger(self.log_location, False)
+            prefix = log_prefix + '_' if log_prefix else ''
+            self.log_file_name = log_file_name % (prefix, prefix)
+            self.log_location = log_folder % prefix
+            print(f'started logger in {self.log_file_name}')
+            self.log = Logger(self.log_file_name, False)
             self.log.append('=' * 30)
             self.log.append(f'{datetime.strftime(datetime.now(), "")} Open page: {url}')
         if c := self._web_driver.get_cookies():
@@ -70,27 +72,23 @@ class WebPage(object):
         time_stamp = datetime.now().strftime(TIME_FORMAT.replace(':', '-'))
         if not file_name:
             # Generate screenshot name based on time_stamp
-            file_name = os.path.join(self.screenshot_location, f'{self.__class__.__name__}_{time_stamp}')
+            file_name = f'{self.__class__.__name__}_screenshot_{time_stamp}_{self._screenshot_number}'
+            self._screenshot_number += 1
+            file_name = os.path.join(self.log_location, file_name)
         # make sure the screenshots folder exists
         path = Path(os.path.dirname(file_name))
-        path.mkdir(parents=True, exist_ok=True)
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except FileExistsError:
+            pass
 
         # check if screenshot with such a name is already taken
-        if file_name in self._screenshots:
-            for i in range(2, 10):
-                if file_name in self._screenshots and file_name + '_' + str(i) not in self._screenshots:
-                    file_name = file_name + '_' + str(i)
 
         if self._web_driver.save_screenshot(file_name + '.png'):
             message = 'screenshot taken:'
         else:
             message = 'failed to take screenshot:'
 
-        if logged:
-            print('logged')
-            screenshot_file_name = os.path.join(log_folder, f'{time_stamp}_{self.__class__.__name__}')
-            rel_name = screenshot_file_name[len(os.path.dirname(__file__)):]
-            self.log.append(f'  {message}: {rel_name}')
         if message == 'screenshot taken:':
             return file_name + '.png'
         else:

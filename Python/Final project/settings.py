@@ -8,7 +8,7 @@ from datetime import datetime
 from shutil import rmtree
 
 DEFAULT_TIMEOUT = 10.0
-CAPTCHA_TIMEOUT = 30.0
+CAPTCHA_TIMEOUT = 15.0
 BASE_URL = 'https://b2c.passport.rt.ru/'
 AUTH_COOKIES = 'auth_cookies.dat'
 auth_data_filename = os.path.join('tests', 'test_data_login.json')
@@ -21,7 +21,8 @@ BANNED_ATTEMPTS = 10
 TS_FORMAT = '%Y-%m-%d_%H-%M'
 TIME_FORMAT = '%H:%M:%S' # %f = fractional second part, microseconds, 6 digits. Not needed
 SLEEP_TIME = 1
-WIPE_OLD_LOGS = True
+WIPE_OLD_LOGS = False
+DELETE_UNNEEDED_SCREENSHOTS = True # Delete screenshots for passed tests. True by default
 
 def get_log_file_folder_names(log_folder_name='log', wipe_old_data=False) -> (str, str):
     ts = datetime.now().strftime(TS_FORMAT)
@@ -32,7 +33,7 @@ def get_log_file_folder_names(log_folder_name='log', wipe_old_data=False) -> (st
     path.mkdir(parents=True, exist_ok=True)
     folder_name = os.path.join(folder_name, f'%slog_{ts}')
     log_file = os.path.join(folder_name, f'%slog_{ts}.txt')
-    return log_file, folder_name
+    return folder_name, log_file
 
 
 def conf_chrome() -> ChromeOptions:
@@ -108,12 +109,19 @@ class ValidData:
     ls = None
 
     def __init__(self):
-        load_dotenv()
-        self.email = os.getenv('valid_email')
-        self.password = os.getenv('valid_password')
-        self.phone = os.getenv('valid_phone')
-        self.login = os.getenv('valid_login')
-        self.ls = os.getenv('valid_ls')
+        try:
+            load_dotenv()
+        except FileNotFoundError:
+            print('\n' + '=' * 30)
+            print('File \'./.env\' doesn\'t exist. Please create one!')
+            print('for further information please refer to README.md')
+            print('=' * 30)
+        else:
+            self.email = os.getenv('valid_email')
+            self.password = os.getenv('valid_password')
+            self.phone = os.getenv('valid_phone')
+            self.login = os.getenv('valid_login')
+            self.ls = os.getenv('valid_ls')
 
 if LOGGED:
     log_folder, log_file_name = get_log_file_folder_names('log', WIPE_OLD_LOGS)

@@ -11,7 +11,7 @@ class BaseLoc:
 
 class AuthLocators(BaseLoc):
     AUTH_PASS = (By.ID, 'password')
-    AUTH_BTN = (By.ID, 'kc-login')
+    AUTH_BTN = (By.XPATH, '//button[@type="submit"]')
     ACTIVE_LOGIN = (By.NAME, 'tab_type')
     CAPTCHA = (By.ID, 'captcha')
     ERROR_MSG = (By.ID, 'form-error-message')
