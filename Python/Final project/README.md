@@ -27,12 +27,12 @@
 ## Установка тестового окружения
 Загрузка кода из GitHub:
 ```bash
-cd "Final project"
 git clone https://github.com/oleza034/Skillfactory/tree/master/Python/Final%20project
 ```
 
 Для установки виртуальной среды Python нужно выполнить команду:
 ```bash
+cd "Final project"
 python -m venv venv
 ```
 Затем, нужно активировать вируальное окружение. В среде Windows из PowerShell:
